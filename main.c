@@ -11,12 +11,12 @@
 #define columnsBM 10
 #define maxCellLength 10
 char boardMatrix[rowsBM][columnsBM][maxCellLength];
-
 pthread_mutex_t lock;
 pthread_t timerThread;
 volatile int keepPlaying = 1;
 
-typedef struct {
+typedef struct
+{
     char originalWord[10];
     char currentWord[10];
     char alternativeWords[5][10];
@@ -34,7 +34,6 @@ typedef struct {
     int hidden;
     int constantIndex;
 } word;
-
 
 word wordsInBoard[6];
 
@@ -214,7 +213,8 @@ void updateBoardForWord(word *w)
     }
 }
 
-void changeWord(int word_index) {
+void changeWord(int word_index)
+{
     word *w = &wordsInBoard[word_index];
     if (!w->guessed && w->numberOfAlternatives > 0)
     {
@@ -226,9 +226,9 @@ void changeWord(int word_index) {
         }
         else
         {
-            int random_index = rand() % w->numberOfAlternatives;
-            strncpy(w->currentWord, w->alternativeWords[random_index], sizeof(w->currentWord) - 1);
-            strncpy(w->definition, w->alternativeDefinitions[random_index], sizeof(w->definition) - 1);
+            int randomIndex = rand() % w->numberOfAlternatives;
+            strncpy(w->currentWord, w->alternativeWords[randomIndex], sizeof(w->currentWord) - 1);
+            strncpy(w->definition, w->alternativeDefinitions[randomIndex], sizeof(w->definition) - 1);
             w->usingAlternative = 1;
         }
         w -> length = strlen(w->currentWord);
@@ -248,9 +248,10 @@ void changeWord(int word_index) {
     }
 }
 
-void alarm_handler(int signum)
+void alarmHandler(int signum)
 {
-    if (signum == SIGALRM) {
+    if (signum == SIGALRM)
+    {
         pthread_mutex_lock(&lock);
         for (int i = 0; i < 6; i++)
         {
@@ -265,7 +266,7 @@ void alarm_handler(int signum)
     }
 }
 
-void *timer_function(void *arg)
+void *timerFunction(void *arg)
 {
     alarm(20);
     pause();
@@ -277,62 +278,73 @@ void *timer_function(void *arg)
 }
 
 
-void sig_handler(int signum) {
-    if (signum == SIGINT) {
+void signalHandlerInterruptedGame(int signum)
+{
+    if (signum == SIGINT)
+    {
         printf("\nEl juego ha sido interrumpido, ¿realmente quieres terminarlo? ");
         char answer = getchar();
-        if (answer == 'y' || answer == 'Y') {
+        if (answer == 'y' || answer == 'Y')
+        {
             keepPlaying = 0;
         }
     }
 }
 
-void setup_signals()
+void setupSignals()
 {
-    signal(SIGINT, sig_handler);
-    signal(SIGALRM, alarm_handler);
+    signal(SIGINT, signalHandlerInterruptedGame);
+    signal(SIGALRM, alarmHandler);
 }
 
-void showBoard() {
+void showBoard()
+{
     printf("+-----");
-    for (int i = 1; i < columnsBM; i++) {
+    for (int i = 1; i < columnsBM; i++)
+    {
         printf("+-----");
     }
     printf("+\n");
-
-    for (int i = 0; i < rowsBM; i++) {
-        for (int j = 0; j < columnsBM; j++) {
+    for (int i = 0; i < rowsBM; i++)
+    {
+        for (int j = 0; j < columnsBM; j++)
+        {
             char cellContent[maxCellLength] = "";
             int found = 0;
-            int guessed_found = 0;
-
-            for (int k = 0; k < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); k++) {
+            int guessedFound = 0;
+            for (int k = 0; k < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); k++)
+            {
                 word *w = &wordsInBoard[k];
                 int startRow = w->row;
                 int startCol = w->column;
                 int endRow = startRow + (w->direction == 'v' ? w->length - 1 : 0);
                 int endCol = startCol + (w->direction == 'h' ? w->length - 1 : 0);
-
-                if (i >= startRow && i <= endRow && j >= startCol && j <= endCol) {
-                    if (w->guessed) {
+                if (i >= startRow && i <= endRow && j >= startCol && j <= endCol)
+                {
+                    if (w->guessed)
+                    {
                         int offset = (w->direction == 'h' ? j - startCol : i - startRow);
                         snprintf(cellContent, sizeof(cellContent), "%c", w->currentWord[offset]);
-                        guessed_found = 1;
+                        guessedFound = 1;
                         break;
                     }
                 }
             }
 
-            if (!guessed_found) {
-                for (int k = 0; k < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); k++) {
+            if (!guessedFound)
+            {
+                for (int k = 0; k < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); k++)
+                {
                     word *w = &wordsInBoard[k];
                     int startRow = w->row;
                     int startCol = w->column;
                     int endRow = startRow + (w->direction == 'v' ? w->length - 1 : 0);
                     int endCol = startCol + (w->direction == 'h' ? w->length - 1 : 0);
 
-                    if (i >= startRow && i <= endRow && j >= startCol && j <= endCol && !w->guessed) {
-                        if (found) {
+                    if (i >= startRow && i <= endRow && j >= startCol && j <= endCol && !w->guessed)
+                    {
+                        if (found)
+                        {
                             strncat(cellContent, "/", sizeof(cellContent) - strlen(cellContent) - 1);
                         }
                         char indexStr[4];
@@ -342,38 +354,37 @@ void showBoard() {
                     }
                 }
             }
-
-            if (!found && !guessed_found) {
+            if (!found && !guessedFound)
+            {
                 strcpy(cellContent, " ");
             }
             printf("|%4s ", cellContent);
         }
         printf("|\n");
 
-        for (int j = 0; j < columnsBM; j++) {
+        for (int j = 0; j < columnsBM; j++)
+        {
             printf("+-----");
         }
         printf("+\n");
     }
 }
 
-
-
-void userInput() {
+void userInput()
+{
     int wordIndex;
     char guess[10];
-
     printf("Buscando las palabras posibles para adivinar: \n");
     for (int i = 0; i < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); i++)
     {
-        if (!wordsInBoard[i].guessed) {
+        if (!wordsInBoard[i].guessed)
+        {
             printf("%d: %s\n", i + 1, wordsInBoard[i].definition);
         }
     }
     printf("Seleccione el número de la palabra que desea adivinar según la definición proporcionada: ");
     scanf("%d", &wordIndex);
     getchar();
-
     if (wordIndex > 0 && wordIndex <= sizeof(wordsInBoard) / sizeof(wordsInBoard[0]) && !wordsInBoard[wordIndex - 1].guessed)
     {
         printf("Ingresa la palabra que piensas que es para la siguiente definición '%s': ", wordsInBoard[wordIndex - 1].definition);
@@ -384,10 +395,14 @@ void userInput() {
             wordsInBoard[wordIndex - 1].guessed = 1;
             updateBoardForWord(&wordsInBoard[wordIndex - 1]);
             printf("¡Correcto! La palabra ha sido añadida al tablero.\n");
-        } else {
+        }
+        else
+        {
             printf("Incorrecto, vuelve a intentar\n");
         }
-    } else {
+    }
+    else
+    {
         printf("Número inválido o correspondiente a una palabra ya adivinada\n");
     }
 }
@@ -396,59 +411,69 @@ void initWordsAndBoard()
 {
     initWords();
     clearMatrix();
-
     for (int i = 0; i < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); i++)
     {
         updateBoardForWord(&wordsInBoard[i]);
     }
 }
 
-int askToContinue() {
+int askToContinue()
+{
     char response;
     printf("¿Quieres jugar de nuevo? (s/n): ");
     scanf(" %c", &response);
     getchar();
-
     return (response == 's' || response == 'S');
 }
 
-void resetGame() {
+void resetGame()
+{
     clearMatrix();
-    for (int i = 0; i < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); i++) {
+    for (int i = 0; i < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); i++)
+    {
         wordsInBoard[i].guessed = 0;
         updateBoardForWord(&wordsInBoard[i]);
     }
 }
 
-int main() {
+int main()
+{
     pthread_mutex_init(&lock, NULL);
-    setup_signals();
-    pthread_create(&timerThread, NULL, timer_function, NULL);
+    setupSignals();
+    pthread_create(&timerThread, NULL, timerFunction, NULL);
 
     pid_t pid = fork();
 
-    if (pid == 0) {
+    if (pid == 0)
+    {
         char answer;
-        do {
+        do
+        {
             showInstructions();
-            printf("¿Has leído las instrucciones? (sí: y / no: n): ");
+            printf("¿Has leído las instrucciones? (s/n): ");
             scanf(" %c", &answer);
-        } while (answer != 'Y' && answer != 'y');
+        } while (answer != 'S' && answer != 's');
         exit(0);
-    } else {
+    }
+    else
+    {
         int status;
         waitpid(pid, &status, 0);
     }
-
     initWordsAndBoard();
-    while (keepPlaying) {
+    while (keepPlaying)
+    {
         showBoard();
         userInput();
-        if (allGuessed()) {
+        if (allGuessed())
+        {
             printf("¡Has adivinado todas las palabras!\n");
-            if (!askToContinue()) {
+            if (!askToContinue())
+            {
                 keepPlaying = 0;
-            } else {
+            }
+            else
+            {
                 resetGame();
             }
         }
