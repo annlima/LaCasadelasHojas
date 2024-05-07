@@ -17,19 +17,23 @@ pthread_t timer_thread;
 volatile int keep_playing = 1;
 
 typedef struct {
+    char original_word[10];
     char current_word[10];
     char alternative_words[5][10];
+    char original_definition[200];
+    char definition[200];
     char alternative_definitions[5][200];
     int num_alternatives;
     int row;
     int col;
     char direction;
     int guessed;
-    char definition[200];
+    int using_alternative;
     int length;
     int index;
     int hidden;
 } word;
+
 
 word my_words[6];
 
@@ -41,14 +45,14 @@ int allGuessed() {
 }
 
 void showInstructions() {
-    printf("Welcome to 'La Casa de Hojas' crossword game.\n");
-    printf("Instructions:\n");
-    printf("1. Words on the board may change if not yet guessed.\n");
-    printf("2. You will be shown word definitions. Choose the word to guess based on the provided definition.\n");
-    printf("3. Correct guesses will fix the word on the board.\n");
-    printf("4. Unfixed words may change after a specified timer interval.\n");
-    printf("5. Try to solve the crossword before all words change.\n");
-    printf("Good luck and have fun!\n\n");
+    printf("Bienvenido al juego de crucigramas 'La Casa de Hojas'.\n");
+    printf("Instrucciones:\n");
+    printf("1. Las palabras en el tablero pueden cambiar si aún no se han adivinado.\n");
+    printf("2. Se te mostrarán definiciones de palabras. Elige la palabra a adivinar basándote en la definición proporcionada.\n");
+    printf("3. Las suposiciones correctas fijarán la palabra en el tablero.\n");
+    printf("4. Las palabras no fijadas pueden cambiar después de un intervalo de tiempo específico.\n");
+    printf("5. Intenta resolver el crucigrama antes de que cambien todas las palabras.\n");
+    printf("¡Buena suerte y diviértete!\n\n");
 }
 
 void clearMatrix() {
@@ -60,11 +64,13 @@ void clearMatrix() {
 }
 
 void init_words() {
-    printf("Initializing words...\n");
+    printf("Inicializando las palabras... \n");
     strcpy(my_words[0].current_word, "oso");
-    strcpy(my_words[0].alternative_words[0], "mesa");
+    strcpy(my_words[0].alternative_words[0], "asar");
     strcpy(my_words[0].definition, "Son animales de gran tamaño, generalmente omnívoro.");
-    strcpy(my_words[0].alternative_definitions[0], "Mueble compuesto de un tablero horizontal liso y sostenido a la altura conveniente.");
+    strcpy(my_words[0].alternative_definitions[0], "Cocinar un alimento en el horno o a la parrilla.");
+    strcpy(my_words[0].original_word, "oso");
+    strcpy(my_words[0].original_definition, "Son animales de gran tamaño, generalmente omnívoro.");
     my_words[0].length = strlen(my_words[0].current_word);
     my_words[0].index = 0;
     my_words[0].row = 0;
@@ -72,11 +78,15 @@ void init_words() {
     my_words[0].direction = 'h';
     my_words[0].num_alternatives = 1;
     my_words[0].hidden = 1;
+    my_words[0].using_alternative = 0;
+
 
     strcpy(my_words[1].current_word, "silla");
     strcpy(my_words[1].alternative_words[0], "sillon");
     strcpy(my_words[1].definition, "Asiento con respaldo, por lo general con cuatro patas, y en que solo cabe una persona.");
     strcpy(my_words[1].alternative_definitions[0], "Silla de brazos, mayor y más cómoda que la ordinaria.");
+    strcpy(my_words[1].original_word, "silla");
+    strcpy(my_words[1].original_definition, "Asiento con respaldo, por lo general con cuatro patas, y en que solo cabe una persona.");
     my_words[1].length = strlen(my_words[1].current_word);
     my_words[1].index = 1;
     my_words[1].row = 0;
@@ -84,11 +94,14 @@ void init_words() {
     my_words[1].direction = 'v';
     my_words[1].num_alternatives = 1;
     my_words[1].hidden = 1;
+    my_words[1].using_alternative = 0;
 
     strcpy(my_words[2].current_word, "lampara");
     strcpy(my_words[2].alternative_words[0], "leopardo");
     strcpy(my_words[2].definition, "Utensilio o aparato que, colgado o sostenido sobre un pie, sirve de soporte a una o varias luces artificiales.");
     strcpy(my_words[2].alternative_definitions[0], "Mamífero carnívoro félido, que generalmente tiene el pelaje amarillo rojizo con manchas negras.");
+    strcpy(my_words[2].original_word, "lampara");
+    strcpy(my_words[2].original_definition, "Utensilio o aparato que, colgado o sostenido sobre un pie, sirve de soporte a una o varias luces artificiales.");
     my_words[2].length = strlen(my_words[2].current_word);
     my_words[2].index = 2;
     my_words[2].row = 3;
@@ -96,11 +109,14 @@ void init_words() {
     my_words[2].direction = 'h';
     my_words[2].num_alternatives = 1;
     my_words[2].hidden = 1;
+    my_words[2].using_alternative = 0;
 
     strcpy(my_words[3].current_word, "copa");
     strcpy(my_words[3].alternative_words[0], "copia");
     strcpy(my_words[3].definition, "Vaso con pie para beber.");
     strcpy(my_words[3].alternative_definitions[0], "Imitación de una obra ajena, con la pretensión de que parezca original.");
+    strcpy(my_words[3].original_word, "copa");
+    strcpy(my_words[3].original_definition, "Vaso con pie para beber.");
     my_words[3].length = strlen(my_words[3].current_word);
     my_words[3].index = 3;
     my_words[3].row = 1;
@@ -108,23 +124,29 @@ void init_words() {
     my_words[3].direction = 'v';
     my_words[3].num_alternatives = 1;
     my_words[3].hidden = 1;
+    my_words[3].using_alternative = 0;
 
     strcpy(my_words[4].current_word, "foca");
     strcpy(my_words[4].alternative_words[0], "fugas");
     strcpy(my_words[4].definition, "Nombre genérico para diversos mamíferos pinnípedos marinos");
     strcpy(my_words[4].alternative_definitions[0], " Salida accidental de gas o de líquido por un orificio o una abertura producidos en su contenedor, en plural");
+    strcpy(my_words[4].original_word, "foca");
+    strcpy(my_words[4].original_definition, "Nombre genérico para diversos mamíferos pinnípedos marinos");
     my_words[4].length = strlen(my_words[4].current_word);
     my_words[4].index = 4;
-    my_words[4].row = 7;
+    my_words[4].row = 6;
     my_words[4].col = 4;
     my_words[4].direction = 'h';
     my_words[4].num_alternatives = 1;
     my_words[4].hidden = 1;
+    my_words[4].using_alternative = 0;
 
     strcpy(my_words[5].current_word, "rata");
     strcpy(my_words[5].alternative_words[0], "ramas");
     strcpy(my_words[5].definition, "Hembra del ratón.");
     strcpy(my_words[5].alternative_definitions[0], "Cada una de las partes que nacen del tronco de la planta y en las cuales brotan por lo común las hojas.");
+    strcpy(my_words[5].original_word, "rata");
+    strcpy(my_words[5].original_definition, "Hembra del ratón.");
     my_words[5].length = strlen(my_words[5].current_word);
     my_words[5].index = 5;
     my_words[5].row = 3;
@@ -132,6 +154,7 @@ void init_words() {
     my_words[5].direction = 'v';
     my_words[5].num_alternatives = 1;
     my_words[5].hidden = 1;
+    my_words[5].using_alternative = 0;
 }
 
 
@@ -168,13 +191,37 @@ void update_board_for_word(word *w) {
 void change_word(int word_index) {
     word *w = &my_words[word_index];
     if (!w->guessed && w->num_alternatives > 0) {
-        int random_index = rand() % w->num_alternatives;
-        strncpy(w->definition, w->alternative_definitions[random_index], sizeof(w->definition) - 1);
-        printf("Change: %s -> %s\n", w->current_word, w->definition);
-        update_board_for_word(w);
-        printf("A word and its definition have changed on the board!\n");
+        if (w->using_alternative) {
+            // Revertir a la palabra y definición original
+            strncpy(w->current_word, w->original_word, sizeof(w->current_word) - 1);
+            strncpy(w->definition, w->original_definition, sizeof(w->definition) - 1);
+            w->using_alternative = 0;
+        } else {
+            // Cambiar a la palabra alternativa
+            int random_index = rand() % w->num_alternatives;
+            strncpy(w->current_word, w->alternative_words[random_index], sizeof(w->current_word) - 1);
+            strncpy(w->definition, w->alternative_definitions[random_index], sizeof(w->definition) - 1);
+            w->using_alternative = 1;
+        }
+
+        w->length = strlen(w->current_word);
+        printf("La palabra ha cambiado...\n");
+        printf("Definición: %s\n", w->definition);
+
+        // Actualización visual en el tablero
+        if (!w->hidden) {
+            for (int i = 0; i < w->length; i++) {
+                int targetRow = w->row + (w->direction == 'v' ? i : 0);
+                int targetCol = w->col + (w->direction == 'h' ? i : 0);
+                pthread_mutex_lock(&lock);
+                snprintf(boardMatrix[targetRow][targetCol], MAX_CELL_LENGTH, "%c", w->current_word[i]);
+                pthread_mutex_unlock(&lock);
+            }
+        }
     }
 }
+
+
 
 void *timer_function(void *arg) {
     struct timespec delay;
@@ -196,7 +243,7 @@ void *timer_function(void *arg) {
 
 void sig_handler(int signum) {
     if (signum == SIGINT) {
-        printf("\nGame interrupted. Do you want to exit? (y/n): ");
+        printf("\nEl juego ha sido interrumpido, ¿realmente quieres terminarlo?: ");
         char answer = getchar();
         if (answer == 'y' || answer == 'Y') {
             keep_playing = 0;
@@ -256,7 +303,7 @@ void userInput() {
 
     printf("Select the number of the word you want to guess based on the definition provided: ");
     scanf("%d", &wordIndex);
-    getchar(); // consume newline
+    getchar();
 
     if (wordIndex > 0 && wordIndex <= sizeof(my_words) / sizeof(my_words[0]) && !my_words[wordIndex - 1].guessed) {
         printf("Enter your guess for the definition '%s': ", my_words[wordIndex - 1].definition);
@@ -282,15 +329,15 @@ int main() {
 
     pid_t pid = fork();
 
-    if (pid == 0) { // Child process
+    if (pid == 0) {
         char answer;
         do {
             showInstructions();
-            printf("Have you read the instructions? (y/n): ");
-            scanf(" %c", &answer); // The space before %c is to skip any whitespace characters
+            printf("¿Has leído las instrucciones? (sí: y / no: n): ");
+            scanf(" %c", &answer);
         } while (answer != 'Y' && answer != 'y');
         exit(0);
-    } else { // Parent process
+    } else {
         int status;
         waitpid(pid, &status, 0);
     }
