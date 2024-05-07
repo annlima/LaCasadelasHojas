@@ -9,8 +9,8 @@
 
 #define rowsBM 10
 #define columnsBM 10
-#define MAX_CELL_LENGTH 10
-char boardMatrix[rowsBM][columnsBM][MAX_CELL_LENGTH];
+#define maxCellLength 10
+char boardMatrix[rowsBM][columnsBM][maxCellLength];
 
 pthread_mutex_t lock;
 pthread_t timerThread;
@@ -36,15 +36,15 @@ typedef struct {
 } word;
 
 
-word my_words[6];
+word wordsInBoard[6];
 
 void showBoard();
 
 int allGuessed()
 {
-    for (int i = 0; i < sizeof(my_words) / sizeof(my_words[0]); i++)
+    for (int i = 0; i < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); i++)
     {
-        if (!my_words[i].guessed) return 0;
+        if (!wordsInBoard[i].guessed) return 0;
     }
     return 1;
 }
@@ -75,104 +75,104 @@ void clearMatrix()
 void initWords()
 {
     printf("Inicializando las palabras... \n");
-    strcpy(my_words[0].currentWord, "oso");
-    strcpy(my_words[0].alternativeWords[0], "asar");
-    strcpy(my_words[0].definition, "Son animales de gran tamaño, generalmente omnívoro.");
-    strcpy(my_words[0].alternativeDefinitions[0], "Cocinar un alimento en el horno o a la parrilla.");
-    strcpy(my_words[0].originalWord, "oso");
-    strcpy(my_words[0].originalDefinition, "Son animales de gran tamaño, generalmente omnívoro.");
-    my_words[0].length = strlen(my_words[0].currentWord);
-    my_words[0].index = 0;
-    my_words[0].row = 0;
-    my_words[0].column = 1;
-    my_words[0].direction = 'h';
-    my_words[0].numberOfAlternatives = 1;
-    my_words[0].hidden = 1;
-    my_words[0].usingAlternative = 0;
+    strcpy(wordsInBoard[0].currentWord, "oso");
+    strcpy(wordsInBoard[0].alternativeWords[0], "asar");
+    strcpy(wordsInBoard[0].definition, "Son animales de gran tamaño, generalmente omnívoro.");
+    strcpy(wordsInBoard[0].alternativeDefinitions[0], "Cocinar un alimento en el horno o a la parrilla.");
+    strcpy(wordsInBoard[0].originalWord, "oso");
+    strcpy(wordsInBoard[0].originalDefinition, "Son animales de gran tamaño, generalmente omnívoro.");
+    wordsInBoard[0].length = strlen(wordsInBoard[0].currentWord);
+    wordsInBoard[0].index = 0;
+    wordsInBoard[0].row = 0;
+    wordsInBoard[0].column = 1;
+    wordsInBoard[0].direction = 'h';
+    wordsInBoard[0].numberOfAlternatives = 1;
+    wordsInBoard[0].hidden = 1;
+    wordsInBoard[0].usingAlternative = 0;
 
 
-    strcpy(my_words[1].currentWord, "silla");
-    strcpy(my_words[1].alternativeWords[0], "sillon");
-    strcpy(my_words[1].definition, "Asiento con respaldo, por lo general con cuatro patas, y en que solo cabe una persona.");
-    strcpy(my_words[1].alternativeDefinitions[0], "Silla de brazos, mayor y más cómoda que la ordinaria.");
-    strcpy(my_words[1].originalWord, "silla");
-    strcpy(my_words[1].originalDefinition, "Asiento con respaldo, por lo general con cuatro patas, y en que solo cabe una persona.");
-    my_words[1].length = strlen(my_words[1].currentWord);
-    my_words[1].index = 1;
-    my_words[1].row = 0;
-    my_words[1].column = 2;
-    my_words[1].direction = 'v';
-    my_words[1].numberOfAlternatives = 1;
-    my_words[1].hidden = 1;
-    my_words[1].usingAlternative = 0;
+    strcpy(wordsInBoard[1].currentWord, "silla");
+    strcpy(wordsInBoard[1].alternativeWords[0], "sillon");
+    strcpy(wordsInBoard[1].definition, "Asiento con respaldo, por lo general con cuatro patas, y en que solo cabe una persona.");
+    strcpy(wordsInBoard[1].alternativeDefinitions[0], "Silla de brazos, mayor y más cómoda que la ordinaria.");
+    strcpy(wordsInBoard[1].originalWord, "silla");
+    strcpy(wordsInBoard[1].originalDefinition, "Asiento con respaldo, por lo general con cuatro patas, y en que solo cabe una persona.");
+    wordsInBoard[1].length = strlen(wordsInBoard[1].currentWord);
+    wordsInBoard[1].index = 1;
+    wordsInBoard[1].row = 0;
+    wordsInBoard[1].column = 2;
+    wordsInBoard[1].direction = 'v';
+    wordsInBoard[1].numberOfAlternatives = 1;
+    wordsInBoard[1].hidden = 1;
+    wordsInBoard[1].usingAlternative = 0;
 
-    strcpy(my_words[2].currentWord, "lampara");
-    strcpy(my_words[2].alternativeWords[0], "leopardo");
-    strcpy(my_words[2].definition, "Utensilio o aparato que, colgado o sostenido sobre un pie, sirve de soporte a una o varias luces artificiales.");
-    strcpy(my_words[2].alternativeDefinitions[0], "Mamífero carnívoro félido, que generalmente tiene el pelaje amarillo rojizo con manchas negras.");
-    strcpy(my_words[2].originalWord, "lampara");
-    strcpy(my_words[2].originalDefinition, "Utensilio o aparato que, colgado o sostenido sobre un pie, sirve de soporte a una o varias luces artificiales.");
-    my_words[2].length = strlen(my_words[2].currentWord);
-    my_words[2].index = 2;
-    my_words[2].row = 3;
-    my_words[2].column = 2;
-    my_words[2].direction = 'h';
-    my_words[2].numberOfAlternatives = 1;
-    my_words[2].hidden = 1;
-    my_words[2].usingAlternative = 0;
+    strcpy(wordsInBoard[2].currentWord, "lampara");
+    strcpy(wordsInBoard[2].alternativeWords[0], "leopardo");
+    strcpy(wordsInBoard[2].definition, "Utensilio o aparato que, colgado o sostenido sobre un pie, sirve de soporte a una o varias luces artificiales.");
+    strcpy(wordsInBoard[2].alternativeDefinitions[0], "Mamífero carnívoro félido, que generalmente tiene el pelaje amarillo rojizo con manchas negras.");
+    strcpy(wordsInBoard[2].originalWord, "lampara");
+    strcpy(wordsInBoard[2].originalDefinition, "Utensilio o aparato que, colgado o sostenido sobre un pie, sirve de soporte a una o varias luces artificiales.");
+    wordsInBoard[2].length = strlen(wordsInBoard[2].currentWord);
+    wordsInBoard[2].index = 2;
+    wordsInBoard[2].row = 3;
+    wordsInBoard[2].column = 2;
+    wordsInBoard[2].direction = 'h';
+    wordsInBoard[2].numberOfAlternatives = 1;
+    wordsInBoard[2].hidden = 1;
+    wordsInBoard[2].usingAlternative = 0;
 
-    strcpy(my_words[3].currentWord, "copa");
-    strcpy(my_words[3].alternativeWords[0], "copia");
-    strcpy(my_words[3].definition, "Vaso con pie para beber.");
-    strcpy(my_words[3].alternativeDefinitions[0], "Imitación de una obra ajena, con la pretensión de que parezca original.");
-    strcpy(my_words[3].originalWord, "copa");
-    strcpy(my_words[3].originalDefinition, "Vaso con pie para beber.");
-    my_words[3].length = strlen(my_words[3].currentWord);
-    my_words[3].index = 3;
-    my_words[3].row = 1;
-    my_words[3].column = 5;
-    my_words[3].direction = 'v';
-    my_words[3].numberOfAlternatives = 1;
-    my_words[3].hidden = 1;
-    my_words[3].usingAlternative = 0;
+    strcpy(wordsInBoard[3].currentWord, "copa");
+    strcpy(wordsInBoard[3].alternativeWords[0], "copia");
+    strcpy(wordsInBoard[3].definition, "Vaso con pie para beber.");
+    strcpy(wordsInBoard[3].alternativeDefinitions[0], "Imitación de una obra ajena, con la pretensión de que parezca original.");
+    strcpy(wordsInBoard[3].originalWord, "copa");
+    strcpy(wordsInBoard[3].originalDefinition, "Vaso con pie para beber.");
+    wordsInBoard[3].length = strlen(wordsInBoard[3].currentWord);
+    wordsInBoard[3].index = 3;
+    wordsInBoard[3].row = 1;
+    wordsInBoard[3].column = 5;
+    wordsInBoard[3].direction = 'v';
+    wordsInBoard[3].numberOfAlternatives = 1;
+    wordsInBoard[3].hidden = 1;
+    wordsInBoard[3].usingAlternative = 0;
 
-    strcpy(my_words[4].currentWord, "foca");
-    strcpy(my_words[4].alternativeWords[0], "fugas");
-    strcpy(my_words[4].definition, "Nombre genérico para diversos mamíferos pinnípedos marinos");
-    strcpy(my_words[4].alternativeDefinitions[0], " Salida accidental de gas o de líquido por un orificio o una abertura producidos en su contenedor, en plural");
-    strcpy(my_words[4].originalWord, "foca");
-    strcpy(my_words[4].originalDefinition, "Nombre genérico para diversos mamíferos pinnípedos marinos");
-    my_words[4].length = strlen(my_words[4].currentWord);
-    my_words[4].index = 4;
-    my_words[4].row = 6;
-    my_words[4].column = 4;
-    my_words[4].direction = 'h';
-    my_words[4].numberOfAlternatives = 1;
-    my_words[4].hidden = 1;
-    my_words[4].usingAlternative = 0;
+    strcpy(wordsInBoard[4].currentWord, "foca");
+    strcpy(wordsInBoard[4].alternativeWords[0], "fugas");
+    strcpy(wordsInBoard[4].definition, "Nombre genérico para diversos mamíferos pinnípedos marinos");
+    strcpy(wordsInBoard[4].alternativeDefinitions[0], " Salida accidental de gas o de líquido por un orificio o una abertura producidos en su contenedor, en plural");
+    strcpy(wordsInBoard[4].originalWord, "foca");
+    strcpy(wordsInBoard[4].originalDefinition, "Nombre genérico para diversos mamíferos pinnípedos marinos");
+    wordsInBoard[4].length = strlen(wordsInBoard[4].currentWord);
+    wordsInBoard[4].index = 4;
+    wordsInBoard[4].row = 6;
+    wordsInBoard[4].column = 4;
+    wordsInBoard[4].direction = 'h';
+    wordsInBoard[4].numberOfAlternatives = 1;
+    wordsInBoard[4].hidden = 1;
+    wordsInBoard[4].usingAlternative = 0;
 
-    strcpy(my_words[5].currentWord, "rata");
-    strcpy(my_words[5].alternativeWords[0], "ramas");
-    strcpy(my_words[5].definition, "Hembra del ratón.");
-    strcpy(my_words[5].alternativeDefinitions[0], "Cada una de las partes que nacen del tronco de la planta y en las cuales brotan por lo común las hojas.");
-    strcpy(my_words[5].originalWord, "rata");
-    strcpy(my_words[5].originalDefinition, "Hembra del ratón.");
-    my_words[5].length = strlen(my_words[5].currentWord);
-    my_words[5].index = 5;
-    my_words[5].row = 3;
-    my_words[5].column = 7;
-    my_words[5].direction = 'v';
-    my_words[5].numberOfAlternatives = 1;
-    my_words[5].hidden = 1;
-    my_words[5].usingAlternative = 0;
+    strcpy(wordsInBoard[5].currentWord, "rata");
+    strcpy(wordsInBoard[5].alternativeWords[0], "ramas");
+    strcpy(wordsInBoard[5].definition, "Hembra del ratón.");
+    strcpy(wordsInBoard[5].alternativeDefinitions[0], "Cada una de las partes que nacen del tronco de la planta y en las cuales brotan por lo común las hojas.");
+    strcpy(wordsInBoard[5].originalWord, "rata");
+    strcpy(wordsInBoard[5].originalDefinition, "Hembra del ratón.");
+    wordsInBoard[5].length = strlen(wordsInBoard[5].currentWord);
+    wordsInBoard[5].index = 5;
+    wordsInBoard[5].row = 3;
+    wordsInBoard[5].column = 7;
+    wordsInBoard[5].direction = 'v';
+    wordsInBoard[5].numberOfAlternatives = 1;
+    wordsInBoard[5].hidden = 1;
+    wordsInBoard[5].usingAlternative = 0;
 
 
-    my_words[0].constantIndex = 1;
-    my_words[1].constantIndex = 2;
-    my_words[2].constantIndex = 3;
-    my_words[3].constantIndex = 4;
-    my_words[4].constantIndex = 5;
-    my_words[5].constantIndex = 6;
+    wordsInBoard[0].constantIndex = 1;
+    wordsInBoard[1].constantIndex = 2;
+    wordsInBoard[2].constantIndex = 3;
+    wordsInBoard[3].constantIndex = 4;
+    wordsInBoard[4].constantIndex = 5;
+    wordsInBoard[5].constantIndex = 6;
 }
 
 
@@ -185,7 +185,7 @@ void updateBoardForWord(word *w)
             int targetRow = w->row + (w->direction == 'v' ? i : 0);
             int targetCol = w->column + (w->direction == 'h' ? i : 0);
             pthread_mutex_lock(&lock);
-            snprintf(boardMatrix[targetRow][targetCol], MAX_CELL_LENGTH, "%c", w->currentWord[i]);
+            snprintf(boardMatrix[targetRow][targetCol], maxCellLength, "%c", w->currentWord[i]);
             pthread_mutex_unlock(&lock);
         }
     } else
@@ -197,7 +197,7 @@ void updateBoardForWord(word *w)
                 int targetRow = w->row + (w->direction == 'v' ? i : 0);
                 int targetCol = w->column + (w->direction == 'h' ? i : 0);
                 pthread_mutex_lock(&lock);
-                snprintf(boardMatrix[targetRow][targetCol], MAX_CELL_LENGTH, "%d", w->index);
+                snprintf(boardMatrix[targetRow][targetCol], maxCellLength, "%d", w->index);
                 pthread_mutex_unlock(&lock);
             }
         } else
@@ -207,7 +207,7 @@ void updateBoardForWord(word *w)
                 int targetRow = w->row + (w->direction == 'v' ? i : 0);
                 int targetCol = w->column + (w->direction == 'h' ? i : 0);
                 pthread_mutex_lock(&lock);
-                snprintf(boardMatrix[targetRow][targetCol], MAX_CELL_LENGTH, "X");
+                snprintf(boardMatrix[targetRow][targetCol], maxCellLength, "X");
                 pthread_mutex_unlock(&lock);
             }
         }
@@ -215,7 +215,7 @@ void updateBoardForWord(word *w)
 }
 
 void changeWord(int word_index) {
-    word *w = &my_words[word_index];
+    word *w = &wordsInBoard[word_index];
     if (!w->guessed && w->numberOfAlternatives > 0)
     {
         if (w->usingAlternative)
@@ -241,7 +241,7 @@ void changeWord(int word_index) {
                 int targetRow = w->row + (w->direction == 'v' ? i : 0);
                 int targetCol = w->column + (w->direction == 'h' ? i : 0);
                 pthread_mutex_lock(&lock);
-                snprintf(boardMatrix[targetRow][targetCol], MAX_CELL_LENGTH, "%c", w->currentWord[i]);
+                snprintf(boardMatrix[targetRow][targetCol], maxCellLength, "%c", w->currentWord[i]);
                 pthread_mutex_unlock(&lock);
             }
         }
@@ -254,7 +254,7 @@ void alarm_handler(int signum)
         pthread_mutex_lock(&lock);
         for (int i = 0; i < 6; i++)
         {
-            if (!my_words[i].guessed)
+            if (!wordsInBoard[i].guessed)
             {
                 changeWord(i);
             }
@@ -302,12 +302,12 @@ void showBoard() {
 
     for (int i = 0; i < rowsBM; i++) {
         for (int j = 0; j < columnsBM; j++) {
-            char cellContent[MAX_CELL_LENGTH] = "";
+            char cellContent[maxCellLength] = "";
             int found = 0;
             int guessed_found = 0;
 
-            for (int k = 0; k < sizeof(my_words) / sizeof(my_words[0]); k++) {
-                word *w = &my_words[k];
+            for (int k = 0; k < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); k++) {
+                word *w = &wordsInBoard[k];
                 int startRow = w->row;
                 int startCol = w->column;
                 int endRow = startRow + (w->direction == 'v' ? w->length - 1 : 0);
@@ -324,8 +324,8 @@ void showBoard() {
             }
 
             if (!guessed_found) {
-                for (int k = 0; k < sizeof(my_words) / sizeof(my_words[0]); k++) {
-                    word *w = &my_words[k];
+                for (int k = 0; k < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); k++) {
+                    word *w = &wordsInBoard[k];
                     int startRow = w->row;
                     int startCol = w->column;
                     int endRow = startRow + (w->direction == 'v' ? w->length - 1 : 0);
@@ -364,25 +364,25 @@ void userInput() {
     char guess[10];
 
     printf("Buscando las palabras posibles para adivinar: \n");
-    for (int i = 0; i < sizeof(my_words) / sizeof(my_words[0]); i++)
+    for (int i = 0; i < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); i++)
     {
-        if (!my_words[i].guessed) {
-            printf("%d: %s\n", i + 1, my_words[i].definition);
+        if (!wordsInBoard[i].guessed) {
+            printf("%d: %s\n", i + 1, wordsInBoard[i].definition);
         }
     }
     printf("Seleccione el número de la palabra que desea adivinar según la definición proporcionada: ");
     scanf("%d", &wordIndex);
     getchar();
 
-    if (wordIndex > 0 && wordIndex <= sizeof(my_words) / sizeof(my_words[0]) && !my_words[wordIndex - 1].guessed)
+    if (wordIndex > 0 && wordIndex <= sizeof(wordsInBoard) / sizeof(wordsInBoard[0]) && !wordsInBoard[wordIndex - 1].guessed)
     {
-        printf("Ingresa la palabra que piensas que es para la siguiente definición '%s': ", my_words[wordIndex - 1].definition);
+        printf("Ingresa la palabra que piensas que es para la siguiente definición '%s': ", wordsInBoard[wordIndex - 1].definition);
         fgets(guess, sizeof(guess), stdin);
         guess[strcspn(guess, "\n")] = 0;
-        if (strcasecmp(my_words[wordIndex - 1].currentWord, guess) == 0)
+        if (strcasecmp(wordsInBoard[wordIndex - 1].currentWord, guess) == 0)
         {
-            my_words[wordIndex - 1].guessed = 1;
-            updateBoardForWord(&my_words[wordIndex - 1]);
+            wordsInBoard[wordIndex - 1].guessed = 1;
+            updateBoardForWord(&wordsInBoard[wordIndex - 1]);
             printf("¡Correcto! La palabra ha sido añadida al tablero.\n");
         } else {
             printf("Incorrecto, vuelve a intentar\n");
@@ -397,9 +397,9 @@ void initWordsAndBoard()
     initWords();
     clearMatrix();
 
-    for (int i = 0; i < sizeof(my_words) / sizeof(my_words[0]); i++)
+    for (int i = 0; i < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); i++)
     {
-        updateBoardForWord(&my_words[i]);
+        updateBoardForWord(&wordsInBoard[i]);
     }
 }
 
@@ -414,9 +414,9 @@ int askToContinue() {
 
 void resetGame() {
     clearMatrix();
-    for (int i = 0; i < sizeof(my_words) / sizeof(my_words[0]); i++) {
-        my_words[i].guessed = 0;
-        updateBoardForWord(&my_words[i]);
+    for (int i = 0; i < sizeof(wordsInBoard) / sizeof(wordsInBoard[0]); i++) {
+        wordsInBoard[i].guessed = 0;
+        updateBoardForWord(&wordsInBoard[i]);
     }
 }
 
