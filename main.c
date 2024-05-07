@@ -1,7 +1,3 @@
-// Andrea Lima Blanca
-// ID: 174723
-// Final Project
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -32,6 +28,7 @@ typedef struct {
     char definition[200];
     int length;
     int index;
+    int hidden;
 } word;
 
 word my_words[6];
@@ -74,6 +71,7 @@ void init_words() {
     my_words[0].col = 1;
     my_words[0].direction = 'h';
     my_words[0].num_alternatives = 1;
+    my_words[0].hidden = 1;
 
     strcpy(my_words[1].current_word, "silla");
     strcpy(my_words[1].alternative_words[0], "sillon");
@@ -85,6 +83,7 @@ void init_words() {
     my_words[1].col = 2;
     my_words[1].direction = 'v';
     my_words[1].num_alternatives = 1;
+    my_words[1].hidden = 1;
 
     strcpy(my_words[2].current_word, "lampara");
     strcpy(my_words[2].alternative_words[0], "leopardo");
@@ -96,6 +95,7 @@ void init_words() {
     my_words[2].col = 2;
     my_words[2].direction = 'h';
     my_words[2].num_alternatives = 1;
+    my_words[2].hidden = 1;
 
     strcpy(my_words[3].current_word, "copa");
     strcpy(my_words[3].alternative_words[0], "copia");
@@ -107,6 +107,7 @@ void init_words() {
     my_words[3].col = 5;
     my_words[3].direction = 'v';
     my_words[3].num_alternatives = 1;
+    my_words[3].hidden = 1;
 
     strcpy(my_words[4].current_word, "foca");
     strcpy(my_words[4].alternative_words[0], "fugas");
@@ -118,6 +119,7 @@ void init_words() {
     my_words[4].col = 4;
     my_words[4].direction = 'h';
     my_words[4].num_alternatives = 1;
+    my_words[4].hidden = 1;
 
     strcpy(my_words[5].current_word, "rata");
     strcpy(my_words[5].alternative_words[0], "ramas");
@@ -129,6 +131,7 @@ void init_words() {
     my_words[5].col = 7;
     my_words[5].direction = 'v';
     my_words[5].num_alternatives = 1;
+    my_words[5].hidden = 1;
 }
 
 
@@ -142,12 +145,22 @@ void update_board_for_word(word *w) {
             pthread_mutex_unlock(&lock);
         }
     } else {
-        for (int i = 0; i < w->length; i++) {
-            int targetRow = w->row + (w->direction == 'v' ? i : 0);
-            int targetCol = w->col + (w->direction == 'h' ? i : 0);
-            pthread_mutex_lock(&lock);
-            snprintf(boardMatrix[targetRow][targetCol], MAX_CELL_LENGTH, "%d", w->index);
-            pthread_mutex_unlock(&lock);
+        if (w->hidden) { // If word is hidden, show its index
+            for (int i = 0; i < w->length; i++) {
+                int targetRow = w->row + (w->direction == 'v' ? i : 0);
+                int targetCol = w->col + (w->direction == 'h' ? i : 0);
+                pthread_mutex_lock(&lock);
+                snprintf(boardMatrix[targetRow][targetCol], MAX_CELL_LENGTH, "%d", w->index);
+                pthread_mutex_unlock(&lock);
+            }
+        } else { // Otherwise, show 'X'
+            for (int i = 0; i < w->length; i++) {
+                int targetRow = w->row + (w->direction == 'v' ? i : 0);
+                int targetCol = w->col + (w->direction == 'h' ? i : 0);
+                pthread_mutex_lock(&lock);
+                snprintf(boardMatrix[targetRow][targetCol], MAX_CELL_LENGTH, "X");
+                pthread_mutex_unlock(&lock);
+            }
         }
     }
 }
@@ -267,7 +280,21 @@ int main() {
     setup_signals();
     pthread_create(&timer_thread, NULL, timer_function, NULL);
 
-    showInstructions();
+    pid_t pid = fork();
+
+    if (pid == 0) { // Child process
+        char answer;
+        do {
+            showInstructions();
+            printf("Have you read the instructions? (y/n): ");
+            scanf(" %c", &answer); // The space before %c is to skip any whitespace characters
+        } while (answer != 'Y' && answer != 'y');
+        exit(0);
+    } else { // Parent process
+        int status;
+        waitpid(pid, &status, 0);
+    }
+
     init_words();
     clearMatrix();
 
