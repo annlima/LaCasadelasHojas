@@ -259,7 +259,7 @@ void alarm_handler(int signum)
                 changeWord(i);
             }
         }
-        showBoard(); // Mueve esta línea aquí para mostrar el tablero después de que todas las palabras cambien
+        showBoard();
         pthread_mutex_unlock(&lock);
         alarm(30);
     }
@@ -392,11 +392,30 @@ void userInput() {
     }
 }
 
-void initWordsAndBoard() {
+void initWordsAndBoard()
+{
     initWords();
     clearMatrix();
 
+    for (int i = 0; i < sizeof(my_words) / sizeof(my_words[0]); i++)
+    {
+        updateBoardForWord(&my_words[i]);
+    }
+}
+
+int askToContinue() {
+    char response;
+    printf("¿Quieres jugar de nuevo? (s/n): ");
+    scanf(" %c", &response);
+    getchar();
+
+    return (response == 's' || response == 'S');
+}
+
+void resetGame() {
+    clearMatrix();
     for (int i = 0; i < sizeof(my_words) / sizeof(my_words[0]); i++) {
+        my_words[i].guessed = 0;
         updateBoardForWord(&my_words[i]);
     }
 }
@@ -422,16 +441,24 @@ int main() {
     }
 
     initWordsAndBoard();
-
     while (keepPlaying) {
         showBoard();
         userInput();
         if (allGuessed()) {
-            break;
+            printf("¡Has adivinado todas las palabras!\n");
+            if (!askToContinue()) {
+                keepPlaying = 0;
+            } else {
+                resetGame();
+            }
         }
     }
 
+    pthread_cancel(timerThread);
     pthread_join(timerThread, NULL);
     pthread_mutex_destroy(&lock);
+
+    printf("Gracias por jugar. ¡Hasta la próxima!\n");
     return 0;
 }
+
