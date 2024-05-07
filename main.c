@@ -221,15 +221,8 @@ void change_word(int word_index) {
     }
 }
 
-
-
-void *timer_function(void *arg) {
-    struct timespec delay;
-    delay.tv_sec = 20; // 20 seconds
-    delay.tv_nsec = 0;
-
-    while (keep_playing) {
-        nanosleep(&delay, NULL); // Timer for changing words
+void alarm_handler(int signum) {
+    if (signum == SIGALRM) {
         pthread_mutex_lock(&lock);
         for (int i = 0; i < 6; i++) {
             if (!my_words[i].guessed) {
@@ -237,9 +230,22 @@ void *timer_function(void *arg) {
             }
         }
         pthread_mutex_unlock(&lock);
+        alarm(20);
     }
+}
+
+
+void *timer_function(void *arg) {
+    alarm(20);
+    pause();
+
+    while (keep_playing) {
+        pause();
+    }
+
     pthread_exit(NULL);
 }
+
 
 void sig_handler(int signum) {
     if (signum == SIGINT) {
@@ -253,11 +259,18 @@ void sig_handler(int signum) {
 
 void setup_signals() {
     struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
     sa.sa_handler = sig_handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
     sigaction(SIGINT, &sa, NULL);
+
+    struct sigaction alarm_sa;
+    memset(&alarm_sa, 0, sizeof(alarm_sa));
+    alarm_sa.sa_handler = alarm_handler;
+    sigaction(SIGALRM, &alarm_sa, NULL);
 }
+
 
 void showBoard() {
     for (int i = 0; i < rowsBM; i++) {
