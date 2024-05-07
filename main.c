@@ -38,6 +38,8 @@ typedef struct {
 
 word my_words[6];
 
+void showBoard();
+
 int allGuessed()
 {
     for (int i = 0; i < sizeof(my_words) / sizeof(my_words[0]); i++)
@@ -49,7 +51,7 @@ int allGuessed()
 
 void showInstructions()
 {
-    printf("Bienvenido al juego de crucigramas 'La Casa de Hojas'.\n");
+    printf("Bienvenido al juego: La Casa de Hojas.\n");
     printf("Instrucciones:\n");
     printf("1. Las palabras en el tablero pueden cambiar si aún no se han adivinado.\n");
     printf("2. Se te mostrarán definiciones de palabras. Elige la palabra a adivinar basándote en la definición proporcionada.\n");
@@ -257,11 +259,11 @@ void alarm_handler(int signum)
                 changeWord(i);
             }
         }
+        showBoard(); // Mueve esta línea aquí para mostrar el tablero después de que todas las palabras cambien
         pthread_mutex_unlock(&lock);
-        alarm(20);
+        alarm(30);
     }
 }
-
 
 void *timer_function(void *arg)
 {
