@@ -14,4 +14,4 @@ Cambio de palabras:
 
 Tablero completado: 
 
-<img width="1188" alt="Captura de pantalla 2024-05-07 a la(s) 11 51 12 p m" src="https://github.com/annlima/LaCasadelasHojas/assets/89811870/87f0b816-9ee5-47a3-af46-f3192cebf523">
+<img width="1503" alt="Captura de pantalla 2024-05-07 a la(s) 11 56 04 p m" src="https://github.com/annlima/LaCasadelasHojas/assets/89811870/c4cbfd78-9613-40ea-9f0e-292669719799">
