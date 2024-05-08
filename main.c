@@ -121,9 +121,9 @@ void initWords()
     wordsInBoard[2].usingAlternative = 0;
 
     strcpy(wordsInBoard[3].currentWord, "copa");
-    strcpy(wordsInBoard[3].alternativeWords[0], "copia");
+    strcpy(wordsInBoard[3].alternativeWords[0], "cupo");
     strcpy(wordsInBoard[3].definition, "Vaso con pie para beber.");
-    strcpy(wordsInBoard[3].alternativeDefinitions[0], "Imitación de una obra ajena, con la pretensión de que parezca original.");
+    strcpy(wordsInBoard[3].alternativeDefinitions[0], "Lugar disponible en un vehículo, local o institución. ");
     strcpy(wordsInBoard[3].originalWord, "copa");
     strcpy(wordsInBoard[3].originalDefinition, "Vaso con pie para beber.");
     wordsInBoard[3].length = strlen(wordsInBoard[3].currentWord);
@@ -137,10 +137,10 @@ void initWords()
 
     strcpy(wordsInBoard[4].currentWord, "foca");
     strcpy(wordsInBoard[4].alternativeWords[0], "fugas");
-    strcpy(wordsInBoard[4].definition, "Nombre genérico para diversos mamíferos pinnípedos marinos");
+    strcpy(wordsInBoard[4].definition, "Nombre genérico para diversos mamíferos pinnípedos marinos, seal en inglés");
     strcpy(wordsInBoard[4].alternativeDefinitions[0], " Salida accidental de gas o de líquido por un orificio o una abertura producidos en su contenedor, en plural");
     strcpy(wordsInBoard[4].originalWord, "foca");
-    strcpy(wordsInBoard[4].originalDefinition, "Nombre genérico para diversos mamíferos pinnípedos marinos");
+    strcpy(wordsInBoard[4].originalDefinition, "Nombre genérico para diversos mamíferos pinnípedos marinos, seal en inglés");
     wordsInBoard[4].length = strlen(wordsInBoard[4].currentWord);
     wordsInBoard[4].index = 4;
     wordsInBoard[4].row = 6;
@@ -262,13 +262,13 @@ void alarmHandler(int signum)
         }
         showBoard();
         pthread_mutex_unlock(&lock);
-        alarm(30);
+        alarm(50);
     }
 }
 
 void *timerFunction(void *arg)
 {
-    alarm(20);
+    alarm(50);
     pause();
     while (keepPlaying)
     {
@@ -382,7 +382,7 @@ void userInput()
             printf("%d: %s\n", i + 1, wordsInBoard[i].definition);
         }
     }
-    printf("Seleccione el número de la palabra que desea adivinar según la definición proporcionada: ");
+    printf("Seleccione el número de la palabra que desea adivinar: ");
     scanf("%d", &wordIndex);
     getchar();
     if (wordIndex > 0 && wordIndex <= sizeof(wordsInBoard) / sizeof(wordsInBoard[0]) && !wordsInBoard[wordIndex - 1].guessed)
