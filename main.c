@@ -277,14 +277,13 @@ void *timerFunction(void *arg)
     pthread_exit(NULL);
 }
 
-
 void signalHandlerInterruptedGame(int signum)
 {
     if (signum == SIGINT)
     {
-        printf("\nEl juego ha sido interrumpido, ¿realmente quieres terminarlo? ");
+        printf("\nEl juego ha sido interrumpido, ¿realmente quieres terminarlo? (s/n) ");
         char answer = getchar();
-        if (answer == 'y' || answer == 'Y')
+        if (answer == 'S' || answer == 's')
         {
             keepPlaying = 0;
         }
