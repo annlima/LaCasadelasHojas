@@ -477,7 +477,8 @@ int main()
             }
         }
     }
-
+    
+    showBoard();
     pthread_cancel(timerThread);
     pthread_join(timerThread, NULL);
     pthread_mutex_destroy(&lock);
